@@ -17,40 +17,21 @@ use Illuminate\Http\Request;
 /**
  * Вывести список всех задач
  */
-Route::get('/', function () {
-    $tasks = Task::orderBy('created_at', 'asc')->get();
-
-    return view('tasks', [
-        'tasks' => $tasks
-    ]);
+Route::get('/', function () {    
+    return view('welcome');
 });
 
-/**
- * Добавить новую задачу
- */
-Route::post('/task', function (Request $request) {
-    // валидация
-    $validator = Validator::make($request->all(), [
-                'name' => 'required|max:255',
-    ]);
 
-    if ($validator->fails()) {
-        return redirect('/')
-                        ->withInput()
-                        ->withErrors($validator);
-    }
-    // добавление задачи
-    $task = new Task;
-    $task->name = $request->name;
-    $task->save();
 
-    return redirect('/');
-});
+// Маршруты аутентификации...
+Route::get('auth/login', 'Auth\AuthController@getLogin');
+Route::post('auth/login', 'Auth\AuthController@postLogin');
+Route::get('auth/logout', 'Auth\AuthController@getLogout');
 
-/**
- * Удалить существующую задачу
- */
-Route::delete('/task/{id}', function ($id) {
-    Task::findOrFail($id)->delete();
-    return redirect('/');
-});
+// Маршруты регистрации...
+Route::get('auth/register', 'Auth\AuthController@getRegister');
+Route::post('auth/register', 'Auth\AuthController@postRegister');
+
+Route::get('/tasks', 'TaskController@index');
+Route::post('/task', 'TaskController@store');
+Route::delete('/task/{task}', 'TaskController@destroy');
